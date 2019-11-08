@@ -1,0 +1,260 @@
+login as: sujith
+sujith@192.168.56.102's password:
+Welcome to Ubuntu 19.04 (GNU/Linux 5.0.0-27-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+
+277 updates can be installed immediately.
+149 of these updates are security updates.
+
+New release '19.10' available.
+Run 'do-release-upgrade' to upgrade to it.
+
+Last login: Tue Nov  5 09:40:39 2019 from 192.168.56.1
+Valid names include: bifrost, bookshelf, oc-id, oc_erchef, oc_id, opscode-erchef, opscode_chef, push-jobs, reporting
+
+sujith@chef-server:~$ sudo chef-server-ctl psql opscode_chef
+[sudo] password for sujith:
+psql (9.6.10)
+Type "help" for help.
+
+opscode_chef=> \d nodes
+                    Table "public.nodes"
+      Column       |            Type             | Modifiers
+-------------------+-----------------------------+-----------
+ id                | character(32)               | not null
+ authz_id          | character(32)               | not null
+ org_id            | character(32)               | not null
+ name              | text                        | not null
+ environment       | text                        | not null
+ last_updated_by   | character(32)               | not null
+ created_at        | timestamp without time zone | not null
+ updated_at        | timestamp without time zone | not null
+ serialized_object | bytea                       |
+ policy_group      | character varying(255)      |
+ policy_name       | character varying(255)      |
+Indexes:
+    "nodes_pkey" PRIMARY KEY, btree (id)
+    "nodes_authz_id_key" UNIQUE CONSTRAINT, btree (authz_id)
+    "nodes_org_id_name_key" UNIQUE CONSTRAINT, btree (org_id, name)
+    "nodes_org_id_environment_index" btree (org_id, environment)
+    "nodes_policy_group" btree (org_id, policy_group)
+    "nodes_policy_name" btree (org_id, policy_name)
+Referenced by:
+    TABLE "node_policy" CONSTRAINT "node_policy_node_id_fkey" FOREIGN KEY (node_id) REFERENCES nodes(id) ON DELETE CASCADE
+
+
+opscode_chef=> select * from nodes;
+                id                |             authz_id             |              org_id              |    name     | environment |         last_updated_by          |
+----------------------------------+----------------------------------+----------------------------------+-------------+-------------+----------------------------------+
+ 73a84987e0b46eed1e006c8d390423ec | cce9a29ebeff7ba9d2ae4e1d5bf35619 | e19dda240b2ead365ea773a84987e0b4 | node8       | _default    | b202655bd0f391aff3abec788f741d3b |
+ 73a84987e0b49c3565567fdc053414dd | 2eb4a238c3322231c586915732f38608 | e19dda240b2ead365ea773a84987e0b4 | node9       | _default    | 7222ed804888ce07f0086c8e3a0f1f8c |
+ 73a84987e0b45c9b6aced57087ecfc39 | 508865130bcdb18f9b7ef4faf9237f92 | e19dda240b2ead365ea773a84987e0b4 | node1       | _default    | 3a35496fc242ed4109736ec285617d5b |
+ 73a84987e0b4e3f163631d6392b8be54 | 4668dab719c52657a9d5f3563b7409e1 | e19dda240b2ead365ea773a84987e0b4 | node10      | _default    | afcc90b37bf7984fd1638600bbdffd3c |
+ 73a84987e0b4d668d94825461442885d | 37f183da09b9b45d9f28c2203d3d9d74 | e19dda240b2ead365ea773a84987e0b4 | node2       | _default    | 2ea4e4b4d2f3abe6a4a25586356af8a3 |
+ 73a84987e0b4f59eea03db6ed874a58a | d679a583de54a02447bf004910f4faaa | e19dda240b2ead365ea773a84987e0b4 | node3       | _default    | 6fb98aecf85b04881a111bb8af8c6b1f |
+ 73a84987e0b48c5ec15c1068bbd3a5a6 | 12e7af20a29d9bb1f12f46c551d8bd71 | e19dda240b2ead365ea773a84987e0b4 | client-node | _default    | c791d072550c034016271e187f0e1562 |
+ 73a84987e0b495c9017f40fa9c27188f | ad2ab3529bac1b523d251ab6453c8930 | e19dda240b2ead365ea773a84987e0b4 | node4       | _default    | a69c0e65fb1bc5558f3e3a0705eabb8a |
+ 73a84987e0b4e577338677c3d3a40a89 | da40f45924d5dab591480bcc20b86d9e | e19dda240b2ead365ea773a84987e0b4 | node5       | _default    | 9653177016e7a5bf4370637b8ed38364 |
+ 73a84987e0b40a182fc13d35d331c15f | fdea2c2d060abb76b7670f64e998ba65 | e19dda240b2ead365ea773a84987e0b4 | node6       | _default    | e1d9a942dba84db5eecce351d9c78cb0 |
+ 73a84987e0b44a17fa7923a12402d37f | 1fb059b29b4ffd6de8b5301813ac7651 | e19dda240b2ead365ea773a84987e0b4 | node7       | _default    | a988e71f1f521e8c74d860f58fa99da7 |
+ 73a84987e0b47597fa54e5d18be42b6e | 4b1aac253ffcbc45f4a5a06a6029180c | e19dda240b2ead365ea773a84987e0b4 | node11      | _default    | 9b24df9cfef818d7803d43208d47db33 |
+(12 rows)
+
+opscode_chef=> \d clients
+                         Table "public.clients"
+     Column      |            Type             |       Modifiers
+-----------------+-----------------------------+------------------------
+ id              | character varying(36)       | not null
+ org_id          | character(32)               | not null
+ authz_id        | character(32)               | not null
+ name            | text                        | not null
+ public_key      | text                        |
+ validator       | boolean                     | not null
+ last_updated_by | character(32)               | not null
+ created_at      | timestamp without time zone | not null
+ updated_at      | timestamp without time zone | not null
+ pubkey_version  | smallint                    | not null
+ admin           | boolean                     | not null default false
+Indexes:
+    "clients_pkey" PRIMARY KEY, btree (id)
+    "clients_authz_id_key" UNIQUE CONSTRAINT, btree (authz_id)
+    "org_id_name_unique" UNIQUE CONSTRAINT, btree (org_id, name)
+Triggers:
+    add_key AFTER INSERT ON clients FOR EACH ROW EXECUTE PROCEDURE add_key()
+    delete_keys AFTER DELETE ON clients FOR EACH ROW EXECUTE PROCEDURE delete_keys()
+    update_key AFTER UPDATE ON clients FOR EACH ROW EXECUTE PROCEDURE update_key()
+
+opscode_chef=> select * from clients;
+                id                |              org_id              |             authz_id             |        name        |                            public_key
+----------------------------------+----------------------------------+----------------------------------+--------------------+------------------------------------------
+ 54c8ff07005b8146dc0da39adead2e36 | 9e23cf3e9a6bc37d4e5b54c8ff07005b | 0c931e66297d4145fdea90bfa69fb1c6 | oracle-validator   |
+ 73a84987e0b48e3ced2d1c978295b646 | e19dda240b2ead365ea773a84987e0b4 | e986ec18dacbd0740cd38f543aa88194 | facebook-validator |
+ 73a84987e0b4b4ee9e9943f6ceca9bdb | e19dda240b2ead365ea773a84987e0b4 | 3a35496fc242ed4109736ec285617d5b | node1              | -----BEGIN PUBLIC KEY-----
+                                  |                                  |                                  |                    | MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCA
+                                  |                                  |                                  |                    | pid5Z01yx+VOjLsVKkZYqCARuihASKbH4HezynQhy
+                                  |                                  |                                  |                    | gFZ/S0jA67elK3jfOfavDt0Hup3jvhzGiJFHXJ/bi
+                                  |                                  |                                  |                    | t8FoiM8InzmHaeNvf/ijhp0OZ7XXN1u/VJWznaCVd
+                                  |                                  |                                  |                    | 3i+UTjfiaZn99D/kGzQghUkOPoRf06n+owh3bvfBi
+                                  |                                  |                                  |                    | A4hYGyjrEt+iuaH3gtLZF1d2LGw2N28i62WK4ejDu
+                                  |                                  |                                  |                    | YQIDAQAB
+                                  |                                  |                                  |                    | -----END PUBLIC KEY-----
+                                  |                                  |                                  |                    |
+ 73a84987e0b40d58760c28a9ca73dc7a | e19dda240b2ead365ea773a84987e0b4 | 2ea4e4b4d2f3abe6a4a25586356af8a3 | node2              | -----BEGIN PUBLIC KEY-----
+                                  |                                  |                                  |                    | MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCA
+                                  |                                  |                                  |                    | J3cG9WnA42QTVY6+NqzPtrf9icpvwdKI7MBzcv6/u
+                                  |                                  |                                  |                    | N4vy/uwmWLIsaV+p92oy+GbRg3M8CtWQcVOSuAIdj
+                                  |                                  |                                  |                    | 9Rk7Xatag3YeiQrZTGme1FPdTcZrgNW57ioC4t/5D
+                                  |                                  |                                  |                    | L7etuC5ExN/PleEp+2jqZ//FjPnNmPz6/Ou2od1rC
+                id                |              org_id              |             authz_id             |        name        |                            public_key
+----------------------------------+----------------------------------+----------------------------------+--------------------+------------------------------------------
+ 54c8ff07005b8146dc0da39adead2e36 | 9e23cf3e9a6bc37d4e5b54c8ff07005b | 0c931e66297d4145fdea90bfa69fb1c6 | oracle-validator   |
+ 73a84987e0b48e3ced2d1c978295b646 | e19dda240b2ead365ea773a84987e0b4 | e986ec18dacbd0740cd38f543aa88194 | facebook-validator |
+ 73a84987e0b4b4ee9e9943f6ceca9bdb | e19dda240b2ead365ea773a84987e0b4 | 3a35496fc242ed4109736ec285617d5b | node1              | -----BEGIN PUBLIC KEY-----
+                                  |                                  |                                  |                    | MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCA
+                                  |                                  |                                  |                    | pid5Z01yx+VOjLsVKkZYqCARuihASKbH4HezynQhy
+                                  |                                  |                                  |                    | gFZ/S0jA67elK3jfOfavDt0Hup3jvhzGiJFHXJ/bi
+                                  |                                  |                                  |                    | t8FoiM8InzmHaeNvf/ijhp0OZ7XXN1u/VJWznaCVd
+                                  |                                  |                                  |                    | 3i+UTjfiaZn99D/kGzQghUkOPoRf06n+owh3bvfBi
+                                  |                                  |                                  |                    | A4hYGyjrEt+iuaH3gtLZF1d2LGw2N28i62WK4ejDu
+                                  |                                  |                                  |                    | YQIDAQAB
+                                  |                                  |                                  |                    | -----END PUBLIC KEY-----
+                                  |                                  |                                  |                    |
+ 73a84987e0b40d58760c28a9ca73dc7a | e19dda240b2ead365ea773a84987e0b4 | 2ea4e4b4d2f3abe6a4a25586356af8a3 | node2              | -----BEGIN PUBLIC KEY-----
+                                  |                                  |                                  |                    | MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCA
+                                  |                                  |                                  |                    | J3cG9WnA42QTVY6+NqzPtrf9icpvwdKI7MBzcv6/u
+                                  |                                  |                                  |                    | N4vy/uwmWLIsaV+p92oy+GbRg3M8CtWQcVOSuAIdj
+                                  |                                  |                                  |                    | 9Rk7Xatag3YeiQrZTGme1FPdTcZrgNW57ioC4t/5D
+                                  |                                  |                                  |                    | L7etuC5ExN/PleEp+2jqZ//FjPnNmPz6/Ou2od1rC
+                                  |                                  |                                  |                    | eOfmroOZivHbWWfoPJQcFpWL70OCZap5E1m5km3RX
+                                  |                                  |                                  |                    | CQIDAQAB
+                                  |                                  |                                  |                    | -----END PUBLIC KEY-----
+                                  |                                  |                                  |                    |
+ 73a84987e0b4ba895f4c1ec5031201ae | e19dda240b2ead365ea773a84987e0b4 | 6fb98aecf85b04881a111bb8af8c6b1f | node3              | -----BEGIN PUBLIC KEY-----
+                                  |                                  |                                  |                    | MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCA
+                                  |                                  |                                  |                    | y1Uapjo7EvnzWJB9alU9gMqftCgb1d6lX8yenXG+R
+                                  |                                  |                                  |                    | oebhNSV9V+NKVqR1JCvtEureczRpfGoh/3KssRTuI
+                                  |                                  |                                  |                    | vVp5ER4Q8jrHHRNfXb5+ECzbMFpKdRbTVF5qggYva
+                                  |                                  |                                  |                    | u+v/sQQjxqm+OnmY/EKZcQV2bse0GnjcDHgB2eM0a
+                                  |                                  |                                  |                    | ECl+1klNSCyTZjqedQhOqDnxFj2Wxxbw2v+3h93Ib
+                                  |                                  |                                  |                    | xQIDAQAB
+                                  |                                  |                                  |                    | -----END PUBLIC KEY-----
+                                  |                                  |                                  |                    |
+ 73a84987e0b495b3387bf3a2b76d166f | e19dda240b2ead365ea773a84987e0b4 | c791d072550c034016271e187f0e1562 | client-node        | -----BEGIN PUBLIC KEY-----
+                                  |                                  |                                  |                    | MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCA
+                                  |                                  |                                  |                    | dlgwiF2Ru0kYGoXnDPoGT96ToCJyC5VKic/SEOa2F
+                                  |                                  |                                  |                    | 9mHFbuC9ffm4/9IH1jGrhdh32f8CDIxmANWJiKYw/
+                                  |                                  |                                  |                    | Gap/7j3RsBMXJqg6jNTpSI1nYj7G4e+S4RZISQMLR
+                                  |                                  |                                  |                    | SpQxo/zhYfCtpOnZSvRbIOBtrp2Dbb2okUd1Ax63f
+                                  |                                  |                                  |                    | 0xuAbujEh51GdyY2zHVdun6Yyl+yyuF8wxSdmXecU
+                                  |                                  |                                  |                    | xwIDAQAB
+                                  |                                  |                                  |                    | -----END PUBLIC KEY-----
+opscode_chef=> select name from nodes;
+    name
+-------------
+ node8
+ node9
+ node1
+ node10
+ node2
+ node3
+ client-node
+ node4
+ node5
+ node6
+ node7
+(11 rows)
+
+opscode_chef=> select name from clients;
+        name
+--------------------
+ oracle-validator
+ facebook-validator
+ node1
+ node2
+ node3
+ client-node
+ node4
+ node5
+ node6
+ node7
+ node8
+ node9
+ node10
+ node11
+(14 rows)
+
+opscode_chef=> select name from clients;
+        name
+--------------------
+ oracle-validator
+ facebook-validator
+ node1
+ node2
+ node3
+ client-node
+ node4
+ node5
+ node6
+ node7
+ node8
+ node9
+ node10
+(13 rows)
+
+opscode_chef=>
+
+
+Steps done in workstation:
+==========================
+
+sujith@chef-workstation:~$ knife node list
+client-node
+node1
+node10
+node11
+node2
+node3
+node4
+node5
+node6
+node7
+node8
+node9
+sujith@chef-workstation:~$ knife node delete node11
+Do you really want to delete node11? (Y/N) y
+Deleted node[node11]
+sujith@chef-workstation:~$ knife node list
+client-node
+node1
+node10
+node2
+node3
+node4
+node5
+node6
+node7
+node8
+node9
+sujith@chef-workstation:~$ knife client list list
+^Csujith@chef-workstation:~$ knife client list
+client-node
+facebook-validator
+node1
+node10
+node11
+node2
+node3
+node4
+node5
+node6
+node7
+node8
+node9
+sujith@chef-workstation:~$ knife client delete node11
+Do you really want to delete node11? (Y/N) y
+Deleted client[node11]
+sujith@chef-workstation:~$
